@@ -50,6 +50,7 @@ RMSE Accuracy (Both with dataset 1):
 
 
 ![Lidar and Radar][img4]
+
 _Both Lidar and Radar_
 
 _Note:_
@@ -67,9 +68,11 @@ Green triangle - Estimated location
 
 
 ![Lidar only][img5]
+
 _Lidar Only_
 
 ![Radar only][img6]
+
 _Radar Only_
 
 **Discussion**:
@@ -89,7 +92,7 @@ _Radar Only_
 
 ### 3. Comparison between EKF and UKF
 
-All Kalman filters have three steps: Initialization --> Prediction --> Update. A standard **Kalman Filter**(KF) can only deal with linear equations. Both **Extended Kalman Filter**(EKF) and **Unscented Kalman Filter**(UKF) is able to use non-linear equations; the difference is: EKF uses Jacobian matrix to linearize non-liear functions, while UKF takes representative points from a Gaussian distribution. 
+All Kalman filters have three steps: Initialization --> Prediction --> Update. A standard **Kalman Filter**(KF) can only deal with linear equations. Both **[Extended Kalman Filter](https://github.com/uranus4ever/Extended-Kalman-Filter-Project)**(EKF) and **Unscented Kalman Filter**(UKF) is able to use non-linear equations; the difference is: EKF uses Jacobian matrix to linearize non-liear functions, while UKF takes representative points from a Gaussian distribution. 
 
 
 [//]: # (Image References)
@@ -98,4 +101,4 @@ All Kalman filters have three steps: Initialization --> Prediction --> Update. A
 [img3]: ./extra/ukf_roadmap.jpg
 [img4]: ./extra/UKF-L-R.PNG
 [img5]: ./extra/UKF-L.PNG
-[img6]: ./extra/UKG-R.PNG
+[img6]: ./extra/UKF-R.PNG

@@ -30,32 +30,27 @@ Utilize sensor data from both LIDAR and RADAR measurements for object (e.g. pede
 3. Make a build directory: `mkdir build && cd build`
 4. Compile: `cmake .. && make` 
    * On windows, you may need to run: `cmake .. -G "Unix Makefiles" && make`
-5. Run the command: `./ExtendedKF`.
+5. Run the command: `./UnscentedKF`.
 6. Run the simulator.
 
 
 ## Result
 
 Threshold for EKF: RMSE <= [0.11, 0.11, 0.52, 0.52] 
-**Threshold for UKF: RMSE <= [0.09, 0.10, 0.40, 0.30] **
+**Threshold for UKF: RMSE <= [0.09, 0.10, 0.40, 0.30]**
 
-Accuracy - RMSE: [xxxx]
+RMSE Accuracy (Both with dataset 1): 
 
 |      State  |  UKF   |    EKF    |   
 |:-----------:|:------:|:---------:|
-|      px     | xxxxxx |  0.0973   | 
-|      py     | xxxxxx |  0.0855   |   
-|      vx     | xxxxxx |  0.4513   |  
-|      vy     | xxxxxx |  0.4399   | 
+|      px     | 0.0762 |  0.0973   | 
+|      py     | 0.0841 |  0.0855   |   
+|      vx     | 0.3232 |  0.4513   |  
+|      vy     | 0.2979 |  0.4399   | 
 
 
-**_Note_**:
-
-* Both with dataset 1.
-
-
-![xxx][imgx]
-
+![Lidar and Radar][img4]
+_Both Lidar and Radar_
 
 _Note:_
 Red Circle - LIDAR measurements
@@ -65,10 +60,17 @@ Green triangle - Estimated location
 
 |      State  |  Lidar and Radar   |    only Lidar  |   only Radar   |
 |:-----------:|:------------------:|:--------------:|:--------------:|
-|      px     |    xxxxxx          |    0.0973      |    0.0973      |
-|      py     |    xxxxxx          |    0.0973      |    0.0973      |  
-|      vx     |    xxxxxx          |    0.0973      |    0.0973      | 
-|      vy     |    xxxxxx          |    0.0973      |    0.0973      |
+|      px     |    0.0762          |    0.1760      |    0.2273      |
+|      py     |    0.0841          |    0.1488      |    0.2973      |  
+|      vx     |    0.3232          |    0.5553      |    0.5146      | 
+|      vy     |    0.2979          |    0.2973      |    0.3964      |
+
+
+![Lidar only][img5]
+_Lidar Only_
+
+![Radar only][img6]
+_Radar Only_
 
 **Discussion**:
 
@@ -89,14 +91,11 @@ Green triangle - Estimated location
 
 All Kalman filters have three steps: Initialization --> Prediction --> Update. A standard **Kalman Filter**(KF) can only deal with linear equations. Both **Extended Kalman Filter**(EKF) and **Unscented Kalman Filter**(UKF) is able to use non-linear equations; the difference is: EKF uses Jacobian matrix to linearize non-liear functions, while UKF takes representative points from a Gaussian distribution. 
 
-## Reflection
-
 
 [//]: # (Image References)
 [img1]: ./extra/ctrv.jpg
-[img2]: ./extra/ukf.jpf
+[img2]: ./extra/ukf.jpg
 [img3]: ./extra/ukf_roadmap.jpg
-
-[img4]: ./extra/ekf_vs_kf.jpg
-[img5]: ./extra/lidar.jpg
-[img6]: ./extra/radar.jpg
+[img4]: ./extra/UKF-L-R.PNG
+[img5]: ./extra/UKF-L.PNG
+[img6]: ./extra/UKG-R.PNG

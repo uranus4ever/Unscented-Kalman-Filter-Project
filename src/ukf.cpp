@@ -2,6 +2,8 @@
 #include "Eigen/Dense"
 #include <iostream>
 
+#define SMALL_VALUE 0.000001
+
 using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -80,7 +82,7 @@ UKF::UKF() {
 
   // Current NIS for Laser
   NIS_laser_ = 0.0;
-  }
+}
 
 
 
@@ -117,10 +119,10 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 
             // Init covariance matrix
             P_ << 0.15, 0, 0, 0, 0,
-                    0, 0.15, 0, 0, 0,
-                    0, 0, 1, 0, 0,
-                    0, 0, 0, 1, 0,
-                    0, 0, 0, 0, 1;
+                  0, 0.15, 0, 0, 0,
+                  0,    0, 1, 0, 0,
+                  0,    0, 0, 1, 0,
+                  0,    0, 0, 0, 1;
 
             // Init timestamp
             time_us_ = meas_package.timestamp_;
@@ -129,7 +131,8 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
                 use_laser_) {
                 x_(0) = meas_package.raw_measurements_(0);
                 x_(1) = meas_package.raw_measurements_(1);
-            } else if (meas_package.sensor_type_ == MeasurementPackage::RADAR &&
+            } 
+            else if (meas_package.sensor_type_ == MeasurementPackage::RADAR &&
                        use_radar_) {
                 // Convert radar from polar to cartesian
                 float rho = meas_package.raw_measurements_[0]; // range
@@ -166,7 +169,8 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
          */
         if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
             UpdateLidar(meas_package);
-        } else if (meas_package.sensor_type_ == MeasurementPackage::RADAR) {
+        } 
+        else if (meas_package.sensor_type_ == MeasurementPackage::RADAR) {
             UpdateRadar(meas_package);
         }
     }
@@ -261,7 +265,7 @@ void UKF::Prediction(double delta_t) {
         double py_p = 0.0;
 
         // Avoid division by zero
-        if (fabs(yawd) > 0.001){
+        if (fabs(yawd) > SMALL_VALUE){
             px_p = p_x + v/yawd * (sin(yaw + yawd * delta_t) - sin(yaw));
             py_p = p_y + v/yawd * (cos(yaw) - cos(yaw + yawd * delta_t));
         }
@@ -368,7 +372,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
 
     // Add measurement noise covariance matrix
     MatrixXd R = MatrixXd(n_z, n_z);
-    R << std_laspx_ * std_laspx_, 0;
+    R << std_laspx_ * std_laspx_, 0,
         0, std_laspy_ * std_laspy_;
     S += R;
 

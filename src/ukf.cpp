@@ -88,6 +88,44 @@ UKF::UKF() {
 
 UKF::~UKF() {}
 
+void UKF::InitValues(const MeasurementPackage meas_package){
+    /**
+    * Initialize the state ekf_.x_ with the first measurement.
+    * Create the covariance matrix.
+    * Remember: you'll need to convert radar from polar to cartesian coordinates.
+    */
+
+    // Initialize state
+    // First measurement
+    x_ << 1, 1, 1, 1, 0.1;
+
+    // Init covariance matrix
+    P_ << 0.15, 0, 0, 0, 0,
+            0, 0.15, 0, 0, 0,
+            0,    0, 1, 0, 0,
+            0,    0, 0, 1, 0,
+            0,    0, 0, 0, 1;
+
+    // Init timestamp
+    time_us_ = meas_package.timestamp_;
+
+    if (meas_package.sensor_type_ == MeasurementPackage::LASER &&
+        use_laser_) {
+        x_(0) = meas_package.raw_measurements_(0);
+        x_(1) = meas_package.raw_measurements_(1);
+    }
+    else if (meas_package.sensor_type_ == MeasurementPackage::RADAR &&
+             use_radar_) {
+        // Convert radar from polar to cartesian
+        float rho = meas_package.raw_measurements_[0]; // range
+        float phi = meas_package.raw_measurements_[1]; // bearing
+        float rho_dot = meas_package.raw_measurements_[2]; // velocity of rho
+        x_(0) = rho * cos(phi);
+        x_(1) = rho * sin(phi);
+    }
+    return;
+}
+
 /**
  * @param {MeasurementPackage} meas_package The latest measurement data of
  * either radar or laser.
@@ -107,40 +145,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
        *  Initialization
        ****************************************************************************/
         if (!is_initialized_) {
-            /**
-              * Initialize the state ekf_.x_ with the first measurement.
-              * Create the covariance matrix.
-              * Remember: you'll need to convert radar from polar to cartesian coordinates.
-            */
-
-            // Initialize state
-            // First measurement
-            x_ << 1, 1, 1, 1, 0.1;
-
-            // Init covariance matrix
-            P_ << 0.15, 0, 0, 0, 0,
-                  0, 0.15, 0, 0, 0,
-                  0,    0, 1, 0, 0,
-                  0,    0, 0, 1, 0,
-                  0,    0, 0, 0, 1;
-
-            // Init timestamp
-            time_us_ = meas_package.timestamp_;
-
-            if (meas_package.sensor_type_ == MeasurementPackage::LASER &&
-                use_laser_) {
-                x_(0) = meas_package.raw_measurements_(0);
-                x_(1) = meas_package.raw_measurements_(1);
-            } 
-            else if (meas_package.sensor_type_ == MeasurementPackage::RADAR &&
-                       use_radar_) {
-                // Convert radar from polar to cartesian
-                float rho = meas_package.raw_measurements_[0]; // range
-                float phi = meas_package.raw_measurements_[1]; // bearing
-                float rho_dot = meas_package.raw_measurements_[2]; // velocity of rho
-                x_(0) = rho * cos(phi);
-                x_(1) = rho * sin(phi);
-            }
+            InitValues(meas_package);
 
             is_initialized_ = true;
 
@@ -437,10 +442,15 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
         double v2 = sin(yaw) * v;
 
         // Measurement model
-        Zsig(0, i) = sqrt(p_x * p_x + p_y * p_y);           // r
-        Zsig(1, i) = atan2(p_y, p_x);                       // phi
-        Zsig(2, i) = (p_x * v1 + p_y * v2) /
-                     sqrt(p_x * p_x + p_y * p_y);           // rho_dot
+        if (p_x * p_x + p_y * p_y > SMALL_VALUE){
+            Zsig(0, i) = sqrt(p_x * p_x + p_y * p_y);           // r
+            Zsig(1, i) = atan2(p_y, p_x);                       // phi
+            Zsig(2, i) = (p_x * v1 + p_y * v2) / Zsig(0, i);    // rho_dot
+        } else {
+            Zsig(0, i) = 0.0;
+            Zsig(1, i) = 0.0;
+            Zsig(2, i) = 0.0;
+        }
     }
 
     // Mean predicted measurement
